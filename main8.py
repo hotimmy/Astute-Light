@@ -141,7 +141,7 @@ def main():
     load_button = b.Button(1130 * scale_o2w,1000 * scale_o2w,load_img,0.2 * scale_o2w)  
     save_button = b.Button(1330 * scale_o2w,1000 * scale_o2w,save_img,0.2 * scale_o2w) 
     exit_button = b.Button( 1770 * scale_o2w,1000 * scale_o2w,exit_img,0.2 * scale_o2w)
-    #c_text = c.Coordinate(48) #(font_size) 座標系統會卡
+    c_text = c.Coordinate(48) #(font_size) 座標系統會卡
 
     #init page init
     x_slider = s.Slider(100 * scale_o2w,700 * scale_o2w,300 * scale_o2w,20 * scale_o2w)
@@ -197,7 +197,7 @@ def main():
             #all page init
             setting_button = b.Button(1850 * scale_o2w,50 * scale_o2w,setting_img,0.2 * scale_o2w)
             logo_button = b.Button(100 * scale_o2w, 100 * scale_o2w , logo_img ,0.2 * scale_o2w)
-            bright_text = t.Text("ADD",int(100 * scale_o2w),(1160 * scale_o2w, 100 * scale_o2w),(255,255,255))
+            bright_text = t.Text("ADD LIGHT",int(50 * scale_o2w),(1160 * scale_o2w, 50 * scale_o2w),(255,255,255))
 
             #track page init
             init_button = b.Button(150 * scale_o2w,1000 * scale_o2w,init_img,0.2 * scale_o2w)
@@ -269,7 +269,7 @@ def main():
         frame_resized = pygame.surfarray.make_surface(frame_resized)#numpy.ndarray to pygame.surface.Surface
         screen.blit(frame_resized, (0,0))
 
-        #c_text.draw(screen) 座標系統會卡
+        #c_text.draw(screen) #座標系統會卡
 
         #Button draw
         if page == "track":
