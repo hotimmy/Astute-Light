@@ -8,6 +8,7 @@ import Slider as s
 import Text as t 
 import Coordinate as c
 import Inputbox as i
+import HistogramTracker as ht
 import math
 import wx
 import json
@@ -60,6 +61,7 @@ def save_file(ip, universe, x_address, y_address, dimmer, shutter, x_left, y_lef
 def convert_range(value, min_in=0, max_in=1920, min_out=100, max_out=200):
     return (value - min_in) / (max_in - min_in) * (max_out - min_out) + min_out
 
+#舊的加亮方式
 def set_brightness(frame, brightness=0):
     if brightness != 0:
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -71,10 +73,48 @@ def set_brightness(frame, brightness=0):
         frame = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
     return frame
 
+def gamma_correction(f, gamma=2.0):
+    # 建立查找表
+    c = 255.0 / (255.0 ** gamma)
+    table = np.array([round(i ** gamma * c) for i in range(256)],dtype=np.uint8)
+    
+    # 應用查找表
+    g = table[f]
+
+    return g
+
 def get_brightness(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = cv2.split(hsv)
-    return np.mean(v)
+    return np.mean(v) #返回平均值 不然會是陣列
+
+#自製性能過慢
+def median_filter(image, kernel_size):
+    # 創建與輸入影像相同大小的零矩陣，用於存儲濾波後的影像
+    filtered_image = np.zeros_like(image)
+    
+    # 分別對R, G, B三個通道進行處理
+    for channel in range(3):
+        # 遍歷影像的每個像素
+        for i in range(image.shape[0]):
+            for j in range(image.shape[1]):
+                temp = []
+                # 遍歷每個像素的鄰域
+                for y in range(j - (kernel_size // 2), j + (kernel_size // 2) + 1):
+                    for x in range(i - (kernel_size // 2), i + (kernel_size // 2) + 1):
+                        # 如果超出了影像範圍，將像素值設置為0
+                        if y < 0 or y >= image.shape[1] or x < 0 or x >= image.shape[0]:
+                            temp.append(0)
+                        else:
+                            # 否則將鄰域像素的值添加到暫存列表中
+                            temp.append(image[x, y, channel])
+                
+                # 將暫存列表中的值按大小排序
+                temp.sort()
+                # 將排序後的中間值賦值給濾波後的影像的當前像素
+                filtered_image[i, j, channel] = temp[(kernel_size * kernel_size) // 2]
+    
+    return filtered_image
 
 def main():
     #Screen init
@@ -103,7 +143,8 @@ def main():
         print("Cannot open camera")
         exit()
     #Tracker init
-    tracker = cv2.TrackerCSRT_create()
+    #tracker = cv2.TrackerCSRT_create()
+    tracker = ht.HistogramTracker()
     tracking = False
     selecting = False
     start_point = None
@@ -240,8 +281,8 @@ def main():
 
         if frame_brightness < brightness_threshold:
             bright = True
-            frame = set_brightness(frame, brightness=100)
-            frame = cv2.medianBlur(frame,5)
+            frame = gamma_correction(frame, gamma = 0.2)
+            frame = cv2.medianBlur(frame,9)
         else:
             bright = False
 
