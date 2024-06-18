@@ -61,7 +61,12 @@ def save_file(ip, universe, x_address, y_address, dimmer, shutter, x_left, y_lef
 def convert_range(value, min_in=0, max_in=1920, min_out=100, max_out=200):
     return (value - min_in) / (max_in - min_in) * (max_out - min_out) + min_out
 
-#舊的加亮方式
+def get_brightness(frame):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+    return np.mean(v) #返回平均值 不然會是陣列
+
+#加亮方式一
 def set_brightness(frame, brightness=0):
     if brightness != 0:
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -72,7 +77,7 @@ def set_brightness(frame, brightness=0):
         final_hsv = cv2.merge((h, s, v))
         frame = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
     return frame
-
+#加亮方式二
 def gamma_correction(f, gamma=2.0):
     # 建立查找表
     c = 255.0 / (255.0 ** gamma)
@@ -83,10 +88,6 @@ def gamma_correction(f, gamma=2.0):
 
     return g
 
-def get_brightness(frame):
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    h, s, v = cv2.split(hsv)
-    return np.mean(v) #返回平均值 不然會是陣列
 
 #自製性能過慢
 def median_filter(image, kernel_size):
