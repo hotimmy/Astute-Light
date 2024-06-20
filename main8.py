@@ -1,3 +1,4 @@
+#v.0.1.1
 import cv2
 from stupidArtnet import StupidArtnet
 import pygame
@@ -300,6 +301,8 @@ def main():
                 a.set_single_value(int(x_address.get_text()), int(convert_range(m1,max_in = original_width,min_out = x_left ,max_out = x_right)))
                 a.set_single_value(int(y_address.get_text()), int(convert_range(m1,max_in= original_width,min_out = y_left ,max_out = y_right)))
                 a.show()
+            else:
+                print("Fail Track")
         
         #Cam draw
         frame_resized = cv2.resize(frame, (window_width, window_height))

@@ -1,3 +1,4 @@
+#v.0.1.1
 import cv2
 import numpy as np
 
@@ -21,7 +22,7 @@ class HistogramTracker:
             raise ValueError("Tracker has not been initialized with a bounding box.")
 
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        dst = cv2.calcBackProject([hsv], [0], self.roi_hist, [0, 180], 1)
+        dst = cv2.calcBackProject([hsv], [0], self.roi_hist, [0, 180], 1) #dst = cv2.calcBackProject(images, channels, hist, ranges, scale)
         
         ret, new_bbox = cv2.meanShift(dst, self.bbox, (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1))
         
